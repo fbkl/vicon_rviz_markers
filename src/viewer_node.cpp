@@ -11,7 +11,7 @@ void callback(const vicon_bridge::MarkersPtr& msg)
 	visualization_msgs::Marker m;
 
 	m.header.stamp = ros::Time::now();
-	m.header.frame_id = "map";
+	m.header.frame_id = msg->header.frame_id;
 	m.type = visualization_msgs::Marker::SPHERE;
 	m.pose.orientation.w = 1;
 	//m.duration=1;
