@@ -1,0 +1,32 @@
+# TODO: generate this from the .osim file instead of maintaining by hand
+# # parse script: scripts/generate_markers_yaml.py
+- marker_name: R.Clavicle
+  marker_tf: clavicle
+  default_position: [0.01835, -0.00464, -0.00046]
+- marker_name: C7
+  marker_tf: thorax
+  default_position: [-0.05613, 0.05528, -0.00151]
+- marker_name: R.Shoulder
+  marker_tf: scapula
+  default_position: [0.0014, -0.00147, 0.01369]
+- marker_name: R.Bicep
+  marker_tf: humerus
+  default_position: [0.01591, -0.18099, -0.00553]
+- marker_name: R.Elbow.Lateral
+  marker_tf: humerus
+  default_position: [0.00509, -0.28055, 0.02884]
+- marker_name: R.Forearm
+  marker_tf: radius
+  default_position: [0.03828, -0.11326, 0.0174]
+- marker_name: R.Radius
+  marker_tf: radius
+  default_position: [0.05749, -0.22722, 0.02738]
+- marker_name: Handle
+  marker_tf: hand
+  default_position: [0.053418, -0.084496, 0.009033]
+- marker_name: R.Elbow.Medial
+  marker_tf: humerus
+  default_position: [-0.00407, -0.28442, -0.05408]
+- marker_name: R.Ulna
+  marker_tf: ulna
+  default_position: [-0.01672, -0.24156, 0.04782]

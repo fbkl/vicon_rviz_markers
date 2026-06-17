@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+	<include file="$(find vio_launch)/launch/includes/machines.xml"/>
+	<!-- -->
+	<arg name="name_tag" 		default="upper" />
+	<arg name="yaml_node_name" 	default="yaml_marker_$(arg name_tag)body_node"/>
+	<arg name="machine" 		default=""/>
+	<group ns="vicon">
+		<node pkg="vicon_rviz_markers" type="yaml_markers" 	name="$(arg yaml_node_name)" machine="$(arg machine)" output="log" if="$(eval arg('machine') != '')">
+			<rosparam command="load" file="$(find vicon_rviz_markers)/config/mobl_markers.yaml" param="marker/observation_order" />
+			<param name="marker/position_multiplier" 	value="1000" />
+			<param name="marker/world_tf_reference" value="opensim_frame" />
+		</node>
+
+		<node pkg="vicon_rviz_markers" type="yaml_markers" 	name="$(arg yaml_node_name)" output="screen" if="$(eval arg('machine') == '' )">
+			<rosparam command="load" file="$(find vicon_rviz_markers)/config/mobl_markers.yaml" param="marker/observation_order" />
+			<param name="marker/position_multiplier" 	value="1000" />
+			<param name="marker/world_tf_reference" value="opensim_frame" />
+		</node>
+	</group>
+</launch>
+
+
