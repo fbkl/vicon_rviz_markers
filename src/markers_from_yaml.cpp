@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	ros::Rate r(10);
 	ros::NodeHandle p_nh{"~/marker"};
 	std::string world_tf_reference;
-	nh.getParam("world_tf_reference", world_tf_reference);
+	p_nh.getParam("world_tf_reference", world_tf_reference);
 	vicon_bridge::Markers these_markers;
 	these_markers.header.frame_id= world_tf_reference;
 
