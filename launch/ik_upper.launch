@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <launch>
 	<arg name="freq" default="100" />
-	<arg name="imu_observation_order" default="['thorax','radius']"/>
 	<arg name="model_file" 		default="/srv/shared/MOBL/MOBL_ARMS_41.osim" />
 	<include file="$(find osrt_ros)/launch/ik_from_orientation_providers.xml">
+		<arg name="ns" 		  value="vicon"/>
 		<arg name="name_tag" 		  value="vicon_upper"/>
 		<arg name="use_position_markers"		  value="true"/>
 		<arg name="use_orientation_markers"		  value="false"/>
