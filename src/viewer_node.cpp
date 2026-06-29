@@ -10,21 +10,29 @@ void callback(const vicon_bridge::MarkersPtr& msg)
 {
 	visualization_msgs::Marker m;
 
+	std::string my_frame = msg->header.frame_id;
 	m.header.stamp = ros::Time::now();
-	m.header.frame_id = msg->header.frame_id;
+	if (my_frame == "") {
+		ROS_WARN_ONCE("you have an empty frame_id in your marker header!!!\nusing map as default, but you may want to fix this!!!!!!!!!");
+		my_frame= "map";
+	}
+
+	m.header.frame_id = my_frame;
 	m.type = visualization_msgs::Marker::SPHERE;
 	m.pose.orientation.w = 1;
 	//m.duration=1;
-	m.scale.x=0.01;
-	m.scale.y=0.01;
-	m.scale.z=0.01;
-	m.color.r=0.80;
-	m.color.g=0.80;
-	m.color.b=0.80;
+	m.scale.x=0.02;
+	m.scale.y=0.02;
+	m.scale.z=0.02;
+	m.color.r=1.00;
+	m.color.g=0.70;
+	m.color.b=0.75;
 	m.color.a=1.0;
 	visualization_msgs::MarkerArray mm;
+	int i =0;
 	for (auto& marker:msg->markers)
 	{
+		if (marker.marker_name =="") {marker.marker_name = std::to_string(i); ROS_WARN_ONCE("You have unlabelled markers!");}
 		m.ns= marker.marker_name;
 		marker.translation.x/=1000;
 		marker.translation.y/=1000;

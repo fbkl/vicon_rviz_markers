@@ -1,32 +1,33 @@
-# TODO: generate this from the .osim file instead of maintaining by hand
-# # parse script: scripts/generate_markers_yaml.py
+# AUTO-GENERATED from .osim — do not edit by hand
+# Regenerate: python scripts/generate_markers_yaml.py model.osim > config/markers.yaml
 - marker_name: R.Clavicle
   marker_tf: clavicle
-  default_position: [0.01835, -0.00464, -0.00046]
+  default_position: [-0.02756274731211403, 0.002507651316238018, 0.024614504789176095]
 - marker_name: C7
   marker_tf: thorax
-  default_position: [-0.05613, 0.05528, -0.00151]
+  default_position: [0.001510000179902451, 0.05528, -0.056129999995160294]
 - marker_name: R.Shoulder
   marker_tf: scapula
-  default_position: [0.0014, -0.00147, 0.01369]
+  default_position: [-0.17046439275893438, 0.034415112812271845, -0.022737911552710106]
 - marker_name: R.Bicep
   marker_tf: humerus
-  default_position: [0.01591, -0.18099, -0.00553]
+  default_position: [-0.16030349914072242, -0.14857975999193204, 0.07688030689296016]
 - marker_name: R.Elbow.Lateral
   marker_tf: humerus
-  default_position: [0.00509, -0.28055, 0.02884]
+  default_position: [-0.19197619399753268, -0.24142280192025814, 0.1167246649126657]
 - marker_name: R.Forearm
   marker_tf: radius
-  default_position: [0.03828, -0.11326, 0.0174]
+  default_position: [-0.18620720595785964, -0.3381232664211708, 0.2183400665895201]
 - marker_name: R.Radius
   marker_tf: radius
-  default_position: [0.05749, -0.22722, 0.02738]
+  default_position: [-0.19404156363419725, -0.4276199651605846, 0.2917190135330804]
 - marker_name: Handle
   marker_tf: hand
-  default_position: [0.053418, -0.084496, 0.009033]
+  default_position: [-0.20083025826550152, -0.5180449836051261, 0.3641782804663527]
 - marker_name: R.Elbow.Medial
   marker_tf: humerus
-  default_position: [-0.00407, -0.28442, -0.05408]
+  default_position: [-0.10875601869949658, -0.24643240478073733, 0.1118343476893737]
 - marker_name: R.Ulna
   marker_tf: ulna
-  default_position: [-0.01672, -0.24156, 0.04782]
+  default_position: [-0.19223999613421394, -0.4672746536022343, 0.22848013950006724]
+

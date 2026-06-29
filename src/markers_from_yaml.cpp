@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 	ROS_INFO_STREAM(ns);
 	//auto markers_pub_ = nh.advertise<vicon_bridge::Markers>(ns+"/markers", 10);
 	auto markers_pub_ = nh.advertise<vicon_bridge::Markers>("markers", 10);
-	ros::Rate r(10);
+	ros::Rate r(100);
 	ros::NodeHandle p_nh{"~/marker"};
 	std::string world_tf_reference;
 	p_nh.getParam("world_tf_reference", world_tf_reference);
