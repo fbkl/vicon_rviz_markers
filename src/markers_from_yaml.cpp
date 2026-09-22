@@ -4,8 +4,9 @@
 #include "XmlRpcException.h"
 #include "XmlRpcValue.h"
 
-
-
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 
 const std::string red("\033[0;31m");
 const std::string green("\033[1;32m");
@@ -16,15 +17,40 @@ const std::string reset("\033[0m");
 
 const std::string bar("\n======================================================\n");
 
-std::vector<vicon_bridge::Marker> get_latest_marker(){
 
+class DummyMarkerGetter{
+	public:
 	std::vector<std::string> markerNames;
-	ros::NodeHandle nh{"~/marker"};
+	ros::NodeHandle nh;
 	std::vector<vicon_bridge::Marker> latest_marker_vec;
 
+    // synthetic motion, so a live pipeline is distinguishable from a frozen one
+    std::string motion = "yaw";         // none | yaw | sway | jitter
+    double motion_frequency = 0.2;      // Hz
+    double motion_amplitude_deg = 20.0; // yaw
+    double motion_amplitude_m = 0.05;   // sway / jitter, BEFORE position_multiplier
+    bool   motion_continuous = false;   // yaw: spin forever instead of oscillating
+    double multiplier = 1.0;            // mm scaling from position_multiplier
+    double cx = 0.0, cz = 0.0;          // marker centroid, so yaw turns the subject
+    ros::Time t0;
+
+	DummyMarkerGetter()
+	{
+	nh = ros::NodeHandle("~/marker");
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    t0 = ros::Time::now();
+
+    nh.param<std::string>("motion", motion, motion);
+    nh.param("motion_frequency", motion_frequency, motion_frequency);
+    nh.param("motion_amplitude_deg", motion_amplitude_deg, motion_amplitude_deg);
+    nh.param("motion_amplitude_m", motion_amplitude_m, motion_amplitude_m);
+    nh.param("motion_continuous", motion_continuous, motion_continuous);
+    ROS_WARN_STREAM(yellow << "AR: synthetic marker motion = " << motion << " ("
+                    << motion_frequency << " Hz). marker/motion:=none for a static cloud."
+                    << reset);
+	
 	try{	
 		XmlRpc::XmlRpcValue markerList;
-		double multiplier =1.0;
 		nh.getParam("position_multiplier", multiplier);
 		nh.getParam("observation_order", markerList);
 		if(markerList.valid())
@@ -78,11 +104,79 @@ std::vector<vicon_bridge::Marker> get_latest_marker(){
 	{
 		ROS_ERROR_STREAM("AR: Could not setup markers" << e.getMessage());
 	}
+    if (!latest_marker_vec.empty()) {
+        for (const auto& m : latest_marker_vec) { cx += m.translation.x; cz += m.translation.z; }
+        cx /= latest_marker_vec.size();
+        cz /= latest_marker_vec.size();
+    }
 	ROS_INFO("AR: Finished serring up markers");
+	
+	
+	}
 
-	return latest_marker_vec;
-}
+    /**
+     * Returns a COPY of the marker cloud with the configured synthetic motion applied.
+     *
+     * The previous version built `a_marker_vec` with the jitter applied and then returned
+     * `latest_marker_vec` -- the untouched original -- so the markers never moved. It also
+     * used `std::rand()*0.01`, which is up to ~2.1e7, not the 10 cm the comment claimed.
+     *
+     * `latest_marker_vec` is the reference cloud and is never mutated, so the motion cannot
+     * drift or accumulate over a long run.
+     */
+    std::vector<vicon_bridge::Marker> get_latest_marker(){
 
+        // live-switchable: `rosparam set <node>/marker/motion none` takes effect next tick.
+        // getParamCached subscribes to param updates, so this is not a master call per frame.
+        std::string requested = motion;
+        nh.getParamCached("motion", requested);
+        if (requested != motion) {
+            ROS_WARN_STREAM(yellow << "AR: synthetic marker motion " << motion << " -> "
+                            << requested << reset);
+            motion = requested;
+            t0 = ros::Time::now(); // restart the phase, so yaw/sway resume from the rest pose
+        }
+
+        std::vector<vicon_bridge::Marker> out = latest_marker_vec;
+        if (motion == "none" || out.empty())
+            return out;
+
+        const double t = (ros::Time::now() - t0).toSec();
+        const double w = 2.0 * M_PI * motion_frequency;
+
+        if (motion == "yaw") {
+            // OpenSim ground is Y-up, so a heading change is a rotation about Y.
+            // Rotate about the marker centroid, not the world origin, or the whole cloud
+            // orbits the origin instead of the subject turning on the spot.
+            const double a = motion_continuous
+                           ? w * t
+                           : (motion_amplitude_deg * M_PI / 180.0) * std::sin(w * t);
+            const double c = std::cos(a), s_ = std::sin(a);
+            for (auto& m : out) {
+                const double x = m.translation.x - cx;
+                const double z = m.translation.z - cz;
+                m.translation.x = cx + c * x + s_ * z;
+                m.translation.z = cz - s_ * x + c * z;
+            }
+        } else if (motion == "sway") {
+            const double d = motion_amplitude_m * multiplier * std::sin(w * t);
+            for (auto& m : out)
+                m.translation.x += d;
+        } else if (motion == "jitter") {
+            const double a = motion_amplitude_m * multiplier;
+            for (auto& m : out) {
+                m.translation.x += a * (2.0 * std::rand() / RAND_MAX - 1.0);
+                m.translation.y += a * (2.0 * std::rand() / RAND_MAX - 1.0);
+                m.translation.z += a * (2.0 * std::rand() / RAND_MAX - 1.0);
+            }
+        } else {
+            ROS_WARN_STREAM_THROTTLE(10, "AR: unknown marker/motion [" << motion
+                                     << "], publishing a static cloud.");
+        }
+
+        return out;
+    }
+};
 int main(int argc, char** argv)
 {
 
@@ -105,13 +199,13 @@ int main(int argc, char** argv)
 	these_markers.header.frame_id= world_tf_reference;
 
 	std::vector<vicon_bridge::Marker> this_marker;
+	auto dMG = DummyMarkerGetter();
 
-	auto markerDefVec = get_latest_marker();
-
-
-	these_markers.markers = markerDefVec;
 	while(ros::ok())
 	{
+		auto markerDefVec = dMG.get_latest_marker();
+
+		these_markers.markers = markerDefVec;
 		these_markers.header.stamp = ros::Time::now();
 
 		markers_pub_.publish(these_markers);
