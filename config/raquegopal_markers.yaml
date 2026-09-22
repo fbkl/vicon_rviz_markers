@@ -1,0 +1,76 @@
+#[info] Updating Model file from 40500 to latest format...
+#[info] Loaded model Rajagopal_2015 from file /srv/shared/Raquegopal/Raquegopal_2026.osim
+#Marker positions in GLOBAL coordinates (default pose):
+
+# AUTO-GENERATED from .osim — do not edit by hand
+# Regenerate: python scripts/generate_markers_yaml.py model.osim > config/markers.yaml
+- marker_name: CLAV
+  marker_tf: torso
+  default_position: [-0.05456690736511458, 1.3840110246087096, -0.0020225166609521743]
+- marker_name: STRN
+  marker_tf: torso
+  default_position: [-0.010551439413214639, 1.2944654234543442, 0.0009941507874664808]
+- marker_name: C7
+  marker_tf: torso
+  default_position: [-0.17098862431694667, 1.4409889167646621, -0.0034532837277818943]
+- marker_name: T10
+  marker_tf: torso
+  default_position: [-0.18863566262926795, 1.2333617691940786, -0.0010652492890066635]
+- marker_name: RSHO
+  marker_tf: torso
+  default_position: [-0.11111967682977028, 1.4363074170567347, 0.17097470073191404]
+- marker_name: LSHO
+  marker_tf: torso
+  default_position: [-0.11111967682977028, 1.4363074170567347, -0.17097470073191404]
+- marker_name: RUPA
+  marker_tf: humerus_r
+  default_position: [-0.1165481475622509, 1.2710566553165856, 0.1719108192321194]
+- marker_name: RELB
+  marker_tf: humerus_r
+  default_position: [-0.12474610064834621, 1.1160051715939245, 0.16319566549365638]
+- marker_name: RFRM
+  marker_tf: radius_r
+  default_position: [-0.1338488131055779, 0.9832923893046293, 0.18465297045389012]
+- marker_name: RWRA
+  marker_tf: radius_r
+  default_position: [-0.11575119873136928, 0.8675502430899449, 0.21679982953084476]
+- marker_name: RWRB
+  marker_tf: radius_r
+  default_position: [-0.11961592461296658, 0.867380299423052, 0.17616607447635746]
+- marker_name: RFIN
+  marker_tf: hand_r
+  default_position: [-0.11504129155577963, 0.7815790738753967, 0.20085859804049785]
+- marker_name: RASI
+  marker_tf: pelvis
+  default_position: [-0.0009290777822944349, 0.996336454300089, 0.11999578478350348]
+- marker_name: RPSI
+  marker_tf: pelvis
+  default_position: [-0.15444693379914354, 0.9833341580906139, 0.05627012442685128]
+- marker_name: LUPA
+  marker_tf: humerus_l
+  default_position: [-0.1165481475622509, 1.2710566553119582, -0.16808918106318732]
+- marker_name: LELB
+  marker_tf: humerus_l
+  default_position: [-0.12474610064834621, 1.1160051716104025, -0.17680433517713406]
+- marker_name: LFRM
+  marker_tf: radius_l
+  default_position: [-0.13384782434894263, 0.983292112399948, -0.188327884143191]
+- marker_name: LWRA
+  marker_tf: radius_l
+  default_position: [-0.11575116820897184, 0.8675499277668506, -0.2167998381541613]
+- marker_name: LWRB
+  marker_tf: radius_l
+  default_position: [-0.11961592461296658, 0.867380299423141, -0.17616607448396246]
+- marker_name: LFIN
+  marker_tf: hand_l
+  default_position: [-0.11504129155578478, 0.7815790738758441, -0.20085859804934428]
+- marker_name: LASI
+  marker_tf: pelvis
+  default_position: [-0.0009290777822944349, 0.996336454300089, -0.11999578478350348]
+- marker_name: LPSI
+  marker_tf: pelvis
+  default_position: [-0.15444693379914354, 0.9833341580906139, -0.05627012442685128]
+- marker_name: RBAK
+  marker_tf: torso
+  default_position: [-0.17687722409888318, 1.37635322260819, 0.11027917662518966]
+

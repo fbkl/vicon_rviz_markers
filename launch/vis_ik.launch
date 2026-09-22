@@ -4,7 +4,7 @@
 	<arg name="model_file" 	default="/srv/data/gait1992/residual_reduction_algorithm/model_adjusted.osim" />
 	<arg name="machine" 		default=""/>
 	<arg name="name_tag"		default="vicon_upper"/>
-	<arg name="ik_node_name" 			default="ik_$(arg name_tag)body_node"/>
+	<arg name="ik_node_name" 			default="vicon/ik"/>
 	<arg name="vis_node_name" 			default="vis_ik_$(arg name_tag)node"/>
 	
 
@@ -12,7 +12,9 @@
                 <param name="model_file" 		value="$(arg model_file)" />
 		<rosparam param="geometry_path_list">['/srv/data/geometry_v3.3','/srv/host_data/Geo'] </rosparam>
 		<param name="which_model_1_2" 		value="2" />
+		<param name="own_tf_prefix" 		value="vicon/ik/" />
 
+		<remap from="/$(arg vis_node_name)/input" to="/$(arg ik_node_name)/output"/>
 		<remap from="/$(arg vis_node_name)/input_filtered" to="/$(arg ik_node_name)/output_filtered"/>
 		<remap from="/in_labels" to="/$(arg ik_node_name)/out_labels"/>
 		
@@ -21,7 +23,9 @@
                 <param name="model_file" 		value="$(arg model_file)" />
 		<rosparam param="geometry_path_list">['/srv/data/geometry_v3.3','/srv/host_data/Geo'] </rosparam>
 		<param name="which_model_1_2" 		value="2" />
+		<param name="own_tf_prefix" 		value="vicon/ik/" />
 
+		<remap from="/$(arg vis_node_name)/input" to="/$(arg ik_node_name)/output"/>
 		<remap from="/$(arg vis_node_name)/input_filtered" to="/$(arg ik_node_name)/output_filtered"/>
 		<remap from="/in_labels" to="/$(arg ik_node_name)/out_labels"/>
 		
