@@ -25,20 +25,22 @@ class DummyMarkerGetter{
 	std::vector<vicon_bridge::Marker> latest_marker_vec;
 
     // synthetic motion, so a live pipeline is distinguishable from a frozen one
-    std::string motion = "yaw";         // none | yaw | sway | jitter
+    std::string motion = "yaw";         // yaw | sway | jitter | none (freeze here) | home (rest pose)
     double motion_frequency = 0.2;      // Hz
     double motion_amplitude_deg = 20.0; // yaw
     double motion_amplitude_m = 0.05;   // sway / jitter, BEFORE position_multiplier
     bool   motion_continuous = false;   // yaw: spin forever instead of oscillating
     double multiplier = 1.0;            // mm scaling from position_multiplier
     double cx = 0.0, cz = 0.0;          // marker centroid, so yaw turns the subject
-    ros::Time t0;
+    ros::Time last_tick;
+    double phase_t = 0.0;               // motion clock: only advances while moving, so pause/resume is seamless
+    std::vector<vicon_bridge::Marker> last_out; // last published cloud, what `none` holds
 
 	DummyMarkerGetter()
 	{
 	nh = ros::NodeHandle("~/marker");
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    t0 = ros::Time::now();
+    last_tick = ros::Time::now();
 
     nh.param<std::string>("motion", motion, motion);
     nh.param("motion_frequency", motion_frequency, motion_frequency);
@@ -46,7 +48,7 @@ class DummyMarkerGetter{
     nh.param("motion_amplitude_m", motion_amplitude_m, motion_amplitude_m);
     nh.param("motion_continuous", motion_continuous, motion_continuous);
     ROS_WARN_STREAM(yellow << "AR: synthetic marker motion = " << motion << " ("
-                    << motion_frequency << " Hz). marker/motion:=none for a static cloud."
+                    << motion_frequency << " Hz). set marker/motion to none to freeze, home for the rest pose."
                     << reset);
 	
 	try{	
@@ -134,15 +136,30 @@ class DummyMarkerGetter{
             ROS_WARN_STREAM(yellow << "AR: synthetic marker motion " << motion << " -> "
                             << requested << reset);
             motion = requested;
-            t0 = ros::Time::now(); // restart the phase, so yaw/sway resume from the rest pose
         }
 
-        std::vector<vicon_bridge::Marker> out = latest_marker_vec;
-        if (motion == "none" || out.empty())
-            return out;
+        const ros::Time now = ros::Time::now();
+        const double dt = (now - last_tick).toSec();
+        last_tick = now;
 
-        const double t = (ros::Time::now() - t0).toSec();
+        if (last_out.empty())
+            last_out = latest_marker_vec;
+
+        // home: back to the rest pose, and rewind the motion clock so the next motion starts there
+        if (motion == "home" || latest_marker_vec.empty()) {
+            phase_t = 0.0;
+            last_out = latest_marker_vec;
+            return last_out;
+        }
+        // none: freeze EXACTLY where we are (jitter included), and do not advance the clock,
+        // so switching back to yaw/sway resumes from this pose instead of jumping
+        if (motion == "none")
+            return last_out;
+
+        phase_t += dt;
+        const double t = phase_t;
         const double w = 2.0 * M_PI * motion_frequency;
+        std::vector<vicon_bridge::Marker> out = latest_marker_vec;
 
         if (motion == "yaw") {
             // OpenSim ground is Y-up, so a heading change is a rotation about Y.
@@ -171,9 +188,12 @@ class DummyMarkerGetter{
             }
         } else {
             ROS_WARN_STREAM_THROTTLE(10, "AR: unknown marker/motion [" << motion
-                                     << "], publishing a static cloud.");
+                                     << "], holding the current pose. use yaw|sway|jitter|none|home");
+            phase_t -= dt; // behave like none: the clock does not run
+            return last_out;
         }
 
+        last_out = out;
         return out;
     }
 };
