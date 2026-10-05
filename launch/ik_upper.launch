@@ -16,6 +16,10 @@
 		<arg name="point_getter_type" 		value="marker"/>
 		<arg name="filter_output"             	value="$(arg filter_output)" />
 		<arg name="imu_base_body"               value="$(arg imu_base_body)" />
+		<arg name="ik_node_name" 		value="ik"/>
+		<!-- why ? because we want to exclude the vio markers here -->
+		<arg name="marker_filter" 		value="-e"/>
+		<arg name="marker_name_prefix" 		value="vio_"/>
 	</include>
 </launch>
 
